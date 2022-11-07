@@ -10,7 +10,11 @@ protected:
   char state = 'r';
 
 public:
-  Semaforo(int green_pin, int yellow_pin, int red_pin) : green_pin(green_pin), yellow_pin(yellow_pin), red_pin(red_pin){};
+  Semaforo(int green_pin, int yellow_pin, int red_pin) : green_pin(green_pin), yellow_pin(yellow_pin), red_pin(red_pin){
+    pinMode(green_pin, OUTPUT);
+    pinMode(yellow_pin, OUTPUT);
+    pinMode(red_pin, OUTPUT);
+  };
 
   void off(){
     digitalWrite(green_pin, LOW);

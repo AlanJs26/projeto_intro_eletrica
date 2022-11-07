@@ -1,7 +1,8 @@
 {
     "sketch": "projetointroele.ino",
-    "board": "arduino:avr:uno",
+    "board": "esp32:esp32:nodemcu-32s",
     "output": "build",
     "port": "COM3",
-    "programmer": "avrispmkii"
+    "programmer": "avrispmkii",
+    "configuration": "FlashFreq=80,UploadSpeed=921600,DebugLevel=none,EraseFlash=none"
 }

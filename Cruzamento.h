@@ -39,6 +39,7 @@ private:
     }
 
 public:
+    int forcedFraction = 30;
     Cruzamento(int tempoAmarelo, int tempoOffset, int maxEstagios)
     {
         this->maxEstagios = maxEstagios;
@@ -81,8 +82,14 @@ public:
     };
 
     void setEstagioForced(int estagio){
-        forcedMode = true;
-        setEstagio(estagio);
+        if ((estagio >= 0 || estagio < numEstagios) && estagio != currentEstagio && previousState == 'n') {
+          if(millis() - currentMillis > e->tempo * 0.3){
+            Serial.printf("estagio: %d  --  currentEstagio: %d\n", estagio, currentEstagio);
+            forcedMode = true;
+            setEstagio((estagio-1)%numEstagios);
+          }
+          
+        }
     }
     void setEstagio(int estagio){
         if (estagio >= 0 || estagio < numEstagios) {
@@ -154,16 +161,16 @@ public:
 
                 if (state == 'r' &&
                     via->getNumPedestres() > 0 &&
-                    millis() - currentMillis > ( forcedMode ? percentage(e->tempo, 30) : e->tempo ) - via->pedestreInterval) {
+                    millis() - currentMillis > ( forcedMode ? percentage(e->tempo, forcedFraction) : e->tempo ) - via->pedestreInterval) {
                     for (int j = 0; j < via->getNumPedestres(); j++) {
                         via->getPedestre(j)->blink();
                     }
                 }
             }
 
-            if (millis() - currentMillis > ( forcedMode ? percentage(e->tempo, 30) : e->tempo )) {
+            if (millis() - currentMillis > ( forcedMode ? percentage(e->tempo, forcedFraction) : e->tempo )) {
 
-                Serial.println("Passou Amarelo");
+                // Serial.println("Passou Amarelo");
                 currentMillis = millis();
                 previousState = 'y';
 
@@ -187,9 +194,9 @@ public:
         }
 
         if (millis() - currentMillis > tempoAmarelo && previousState == 'y') {
-            Serial.println("Passou Offset/Vermelho");
+            // Serial.println("Passou Offset/Vermelho");
             currentMillis = millis();
-            previousState = 'o';
+            
 
             for (int i = 0; i < e->numVias; i++)
             {
@@ -202,17 +209,15 @@ public:
                     }
                 }
             }
+            previousState = 'o';
         }
 
 
         if (millis() - currentMillis > tempoOffset && previousState == 'o') {
-            Serial.println("Passou Next Estagio");
+            // Serial.println("Passou Next Estagio");
             currentMillis = millis();
-            previousState = 'n';
-            currentEstagio++;
-
-            if (currentEstagio >= numEstagios)
-                currentEstagio = 0;
+            
+            currentEstagio = (currentEstagio+1)%numEstagios;
 
 
             e = estagios[currentEstagio];
@@ -232,6 +237,7 @@ public:
             }
 
             forcedMode = false;
+            previousState = 'n';
 
         }
 

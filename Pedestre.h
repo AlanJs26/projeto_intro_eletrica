@@ -13,6 +13,7 @@ private:
 
 public:
   Pedestre(int green_pin, int red_pin, int blinkInterval) : blinkInterval(blinkInterval), Semaforo(green_pin,red_pin,red_pin){
+    
   };
 
 
